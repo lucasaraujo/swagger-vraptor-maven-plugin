@@ -35,6 +35,8 @@ local.properties
 .target
 # TeXlipse plugin
 .texlipse
+.classpath
+.project
 
 # Maven
 target/
