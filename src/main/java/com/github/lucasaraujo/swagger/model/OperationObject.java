@@ -76,7 +76,7 @@ public class OperationObject extends DataTypeFields implements Serializable {
 	/**
 	 * Not implemented.
 	 */
-	public Map<?, ?> authorizations = Collections.emptyMap();
+	public Map<?, ?> authorizations = Collections.emptyMap(); // TODO
 
 	/**
 	 * <b>Required.</b> The inputs to the operation. If no parameters are
@@ -94,14 +94,14 @@ public class OperationObject extends DataTypeFields implements Serializable {
 	 * global {@link ApiDeclaration#produces} definition at the root of the API
 	 * Declaration. Each {@link String} value SHOULD represent a MIME type.
 	 */
-	public List<String> produces;
+	public String[] produces;
 
 	/**
 	 * A list of MIME types this operation can consume. This is overrides the
 	 * global {@link ApiDeclaration#consumes} definition at the root of the API
 	 * Declaration. Each {@link String} value SHOULD represent a MIME type.
 	 */
-	public List<String> consumes;
+	public String[] consumes;
 
 	/**
 	 * Declares this operation to be deprecated. Usage of the declared operation

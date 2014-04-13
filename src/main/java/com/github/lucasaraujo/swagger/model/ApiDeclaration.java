@@ -102,11 +102,13 @@ public class ApiDeclaration implements Serializable {
 	 * A list of MIME types the APIs on this resource can produce. This is
 	 * global to all APIs but can be overridden on specific API calls.
 	 */
-	public List<String> produces;
+	public String[] produces;
 
 	/**
 	 * A list of MIME types the APIs on this resource can consume. This is
 	 * global to all APIs but can be overridden on specific API calls.
 	 */
-	public List<String> consumes;
+	public String[] consumes;
+
+	// TODO Authorizations
 }

@@ -163,5 +163,4 @@ public class ApiSourceMojo extends AbstractMojo {
 				+ useOutputFlatStructure + "]";
 	}
 
-
 }

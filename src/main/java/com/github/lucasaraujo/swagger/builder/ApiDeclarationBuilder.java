@@ -38,7 +38,6 @@ import com.wordnik.swagger.annotations.ApiOperation;
 public class ApiDeclarationBuilder extends BaseBuilder {
 
 	public static ApiDeclaration buidOf(Class<?> clazz) throws MojoExecutionException {
-
 		Api api = clazz.getAnnotation(Api.class);
 		Path aPath = clazz.getAnnotation(Path.class);
 
@@ -46,6 +45,8 @@ public class ApiDeclarationBuilder extends BaseBuilder {
 		ApiDeclaration apiDeclaration = new ApiDeclaration();
 		apiDeclaration.apis = new ArrayList<ApiObject>();
 		apiDeclaration.models = new HashMap<String, ModelObject>();
+		apiDeclaration.produces = splitMineTypes(api.produces());
+		apiDeclaration.consumes = splitMineTypes(api.consumes());
 		Map<String, ApiObject> pathToApiObject = new HashMap<String, ApiObject>();
 
 		for (Method method : clazz.getMethods()) {

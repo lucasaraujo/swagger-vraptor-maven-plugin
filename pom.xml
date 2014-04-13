@@ -9,12 +9,19 @@
 
 	<name>Swagger Vraptor Maven Plugin</name>
 
-	<!-- FIXME change it to the project's website -->
-	<url>http://maven.apache.org</url>
+	<url>https://github.com/lucasaraujo/swagger-vraptor-maven-plugin/</url>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<maven.version>3.1.1</maven.version>
+		<github.global.server>github</github.global.server>
 	</properties>
+
+	<parent>
+		<groupId>org.sonatype.oss</groupId>
+		<artifactId>oss-parent</artifactId>
+		<version>7</version>
+	</parent>
 
 	<dependencies>
 		<dependency>
@@ -121,28 +128,11 @@
 			</plugin>
 		</plugins>
 	</reporting>
+	<description>A maven build plugin which helps you generate API document during build phase</description>
+	<scm>
+		<url>scm:git:git@github.com:lucasaraujo/swagger-vraptor-maven-plugin.git</url>
+		<connection>scm:git:git@github.com:lucasaraujo/swagger-vraptor-maven-plugin.git</connection>
+		<developerConnection>scm:git:git@github.com:lucasaraujo/swagger-vraptor-maven-plugin.git</developerConnection>
+	</scm>
+
 </project>
-
-
-<!-- 			<plugin> -->
-<!-- 				<groupId>com.github.lucasaraujo</groupId> -->
-<!-- 				<artifactId>swagger-vraptor-maven-plugin</artifactId> -->
-<!-- 				<version>0.1-SNAPSHOT</version> -->
-<!-- 				<configuration> -->
-<!-- 					<apiVersion>1.0.0</apiVersion> -->
-<!-- 					<basePath>/</basePath> -->
-<!-- 					<locations> -->
-<!-- 						<param>br.com.zup.copycat.natura.controller</param> -->
-<!-- 					</locations> -->
-<!-- 					<swaggerDirectory>${basedir}/src/main/webapp/api-docs</swaggerDirectory> -->
-<!-- 					<useOutputFlatStructure>true</useOutputFlatStructure> -->
-<!-- 				</configuration> -->
-<!-- 				<executions> -->
-<!-- 					<execution> -->
-<!-- 						<phase>process-classes</phase> -->
-<!-- 						<goals> -->
-<!-- 							<goal>generate</goal> -->
-<!-- 						</goals> -->
-<!-- 					</execution> -->
-<!-- 				</executions> -->
-<!-- 			</plugin> -->

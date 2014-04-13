@@ -399,4 +399,11 @@ public class BaseBuilder {
 		}
 	}
 
+	static String[] splitMineTypes(String types) {
+		if (types != null && types.trim().length() > 0) {
+			return types.trim().split("\\s*,\\s*");
+		}
+		return null;
+	}
+
 }

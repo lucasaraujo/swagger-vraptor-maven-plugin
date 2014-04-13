@@ -35,19 +35,23 @@ public class OperationObjectBuilder extends BaseBuilder {
 		operationObject.summary = operation.value();
 		operationObject.notes = operation.notes();
 		operationObject.nickname = nicknameFromMethod(method);
+		operationObject.produces = splitMineTypes(operation.produces());
+		operationObject.consumes = splitMineTypes(operation.consumes());
 		operationObject.parameters = ParameterObjectBuilder.buildOf(operationObject.method, path, method, apiDeclaration);
-		// TODO
-//		operationObject.responseMessages = Collections.emptyList();
-//		operationObject.consumes = new ArrayList<String>();
+		// TODO responseMessages
+
+		// Set operation return value
 		if (operation.responseContainer().length() > 0) {
 			boolean uniqueItems = operation.responseContainer().equalsIgnoreCase("set");
 			setDataTypeFields(operationObject, operation.response(), true, uniqueItems, apiDeclaration);
 		} else {
 			setDataTypeFields(operationObject, operation.response(), apiDeclaration);
 		}
+
 		if (method.getAnnotation(Deprecated.class) != null) {
 			operationObject.deprecated = "Deprecated";
 		}
+
 		return operationObject;
 	}
 

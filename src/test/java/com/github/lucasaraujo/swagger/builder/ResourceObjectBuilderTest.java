@@ -50,6 +50,11 @@ public class ResourceObjectBuilderTest {
 	@Api(value = "")
 	static class FourthController {}
 
+	@Test
+	public void it_should_create_an_instace() {
+		ResourceObjectBuilder builder = new ResourceObjectBuilder();
+		assertNotNull(builder);
+	}
 
 	@Test
 	public void it_should_set_the_resource_description() {

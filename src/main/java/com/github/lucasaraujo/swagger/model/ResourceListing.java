@@ -61,4 +61,6 @@ public class ResourceListing implements Serializable {
 	 */
 	public String apiVersion;
 
+	// TODO Authorizations
+
 }
