@@ -20,3 +20,28 @@ software distributed under the License is distributed on an
 KIND, either express or implied. See the License for the
 specific language governing permissions and limitations
 under the License.
+
+Usage
+=====
+
+			<plugin>
+				<groupId>com.github.lucasaraujo</groupId>
+				<artifactId>swagger-vraptor-maven-plugin</artifactId>
+				<version>0.1</version>
+				<configuration>
+					<apiVersion>1.0.0</apiVersion>
+					<basePath>/</basePath>
+					<locations>
+						<param>org.company.controller</param>
+					</locations>
+					<swaggerDirectory>${basedir}/src/main/webapp/api-docs</swaggerDirectory>
+				</configuration>
+				<executions>
+					<execution>
+						<phase>process-classes</phase>
+						<goals>
+							<goal>generate</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
