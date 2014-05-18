@@ -26,20 +26,20 @@ import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
 @JsonSerialize(include = Inclusion.NON_NULL)
 public class DataTypeFields extends ItemsObject {
 
-	private static final long serialVersionUID = -7284080457367013235L;
+    private static final long serialVersionUID = -7284080457367013235L;
 
-	public String defaultValue;
+    public String defaultValue;
 
-	@JsonProperty("enum")
-	public Enum<?>[] enun;
+    @JsonProperty("enum")
+    public Enum<?>[] enun;
 
-	public String minimum;
+    public String minimum;
 
-	public String maximum;
+    public String maximum;
 
-	public ItemsObject items;
+    public ItemsObject items;
 
-	@JsonSerialize(include = Inclusion.NON_DEFAULT)
-	public boolean uniqueItems;
+    @JsonSerialize(include = Inclusion.NON_DEFAULT)
+    public boolean uniqueItems;
 
 }

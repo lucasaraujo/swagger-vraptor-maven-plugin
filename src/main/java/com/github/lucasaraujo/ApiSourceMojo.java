@@ -19,11 +19,12 @@
 
 package com.github.lucasaraujo;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Set;
-
+import com.github.lucasaraujo.swagger.builder.ApiDeclarationBuilder;
+import com.github.lucasaraujo.swagger.builder.ResourceObjectBuilder;
+import com.github.lucasaraujo.swagger.model.ApiDeclaration;
+import com.github.lucasaraujo.swagger.model.ResourceListing;
+import com.github.lucasaraujo.swagger.model.ResourceObject;
+import com.wordnik.swagger.annotations.Api;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
@@ -34,12 +35,11 @@ import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
 import org.reflections.Reflections;
 
-import com.github.lucasaraujo.swagger.builder.ApiDeclarationBuilder;
-import com.github.lucasaraujo.swagger.builder.ResourceObjectBuilder;
-import com.github.lucasaraujo.swagger.model.ApiDeclaration;
-import com.github.lucasaraujo.swagger.model.ResourceListing;
-import com.github.lucasaraujo.swagger.model.ResourceObject;
-import com.wordnik.swagger.annotations.Api;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * @author Lucas Araújo
@@ -47,120 +47,118 @@ import com.wordnik.swagger.annotations.Api;
 @Mojo(name = "generate", defaultPhase = LifecyclePhase.PROCESS_CLASSES, requiresDependencyResolution = ResolutionScope.COMPILE_PLUS_RUNTIME, configurator = "include-project-dependencies")
 public class ApiSourceMojo extends AbstractMojo {
 
-	@Parameter(required = true)
-	private String apiVersion;
+    @Parameter(defaultValue = "true")
+    public boolean useOutputFlatStructure;
+    @Parameter(required = true)
+    private String apiVersion;
+    @Parameter(defaultValue = "/", required = true)
+    private String basePath;
+    @Parameter
+    private String[] locations;
+    @Parameter(defaultValue = "${basedir}", required = true)
+    private File swaggerDirectory;
 
-	@Parameter(defaultValue = "/", required = true)
-	private String basePath;
+    public void execute() throws MojoExecutionException {
+        getLog().debug(toString());
+        getSwaggerDirectory().mkdirs();
 
-	@Parameter
-	private String[] locations;
+        ResourceListing listing = new ResourceListing();
+        listing.apiVersion = getApiVersion();
+        listing.apis = new ArrayList<ResourceObject>();
 
-	@Parameter(defaultValue = "${basedir}", required = true)
-	private File swaggerDirectory;
+        for (Class<?> clazz : getValidClasses()) {
+            for (ResourceObject resourceObject : ResourceObjectBuilder.buildOf(clazz)) {
+                listing.apis.add(resourceObject);
+                ApiDeclaration apiDeclaration = ApiDeclarationBuilder.buildOf(clazz);
+                apiDeclaration.apiVersion = apiVersion;
+                apiDeclaration.basePath = basePath;
+                apiDeclaration.resourcePath = resourceObject.path;
 
-	@Parameter(defaultValue = "true")
-	public boolean useOutputFlatStructure;
+                try {
+                    ObjectMapper mapper = new ObjectMapper();
+                    mapper.setSerializationInclusion(Inclusion.NON_NULL);
+                    File file = new File(getSwaggerDirectory(), resourceObject.path);
+                    file.createNewFile();
+                    mapper.writeValue(file, apiDeclaration);
+                } catch (Exception e) {
+                    throw new MojoExecutionException("Generating file error", e);
+                }
+            }
+        }
 
-	public void execute() throws MojoExecutionException {
-		getLog().debug(toString());
-		getSwaggerDirectory().mkdirs();
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.setSerializationInclusion(Inclusion.NON_NULL);
+        try {
+            File file = new File(getSwaggerDirectory(), "service");
+            file.createNewFile();
+            mapper.writeValue(file, listing);
+        } catch (Exception e) {
+            throw new MojoExecutionException("Generating file error", e);
+        }
+    }
 
-		ResourceListing listing = new ResourceListing();
-		listing.apiVersion = getApiVersion();
-		listing.apis = new ArrayList<ResourceObject>();
+    private Set<Class<?>> getValidClasses() {
+        Set<Class<?>> classes;
+        if (getLocations() != null && getLocations().length > 0) {
+            classes = new HashSet<Class<?>>();
+            for (String location : getLocations()) {
+                Reflections reflections = new Reflections(location);
+                classes.addAll(reflections.getTypesAnnotatedWith(Api.class));
+            }
+        } else {
+            classes = new Reflections("").getTypesAnnotatedWith(Api.class);
+        }
+        return classes;
+    }
 
-		for (Class<?> clazz : getValidClasses()) {
-			for (ResourceObject resourceObject : ResourceObjectBuilder.buildOf(clazz)) {
-				listing.apis.add(resourceObject);
-				ApiDeclaration apiDeclaration = ApiDeclarationBuilder.buidOf(clazz);
-				apiDeclaration.apiVersion = apiVersion;
-				apiDeclaration.basePath = basePath;
-				apiDeclaration.resourcePath = resourceObject.path;
+    public String getApiVersion() {
+        return apiVersion;
+    }
 
-				try {
-					ObjectMapper mapper = new ObjectMapper();
-					mapper.setSerializationInclusion(Inclusion.NON_NULL);
-					File file = new File(getSwaggerDirectory(), resourceObject.path);
-					file.createNewFile();
-					mapper.writeValue(file, apiDeclaration);
-				} catch (Exception e) {
-					throw new MojoExecutionException("Generating file error", e);
-				}
-			}
-		}
+    public void setApiVersion(String apiVersion) {
+        this.apiVersion = apiVersion;
+    }
 
-		ObjectMapper mapper = new ObjectMapper();
-		mapper.setSerializationInclusion(Inclusion.NON_NULL);
-		try {
-			File file = new File(getSwaggerDirectory(), "service");
-			file.createNewFile();
-			mapper.writeValue(file, listing);
-		} catch (Exception e) {
-			throw new MojoExecutionException("Generating file error", e);
-		}
-	}
+    public String getBasePath() {
+        return basePath;
+    }
 
-	private Set<Class<?>> getValidClasses() {
-		Set<Class<?>> classes;
-		if (getLocations() != null && getLocations().length > 0) {
-			classes = new HashSet<Class<?>>();
-			for (String location : getLocations()) {
-				Reflections reflections = new Reflections(location);
-				classes.addAll(reflections.getTypesAnnotatedWith(Api.class));
-			}
-		} else {
-			classes = new Reflections("").getTypesAnnotatedWith(Api.class);
-		}
-		return classes;
-	}
+    public void setBasePath(String basePath) {
+        this.basePath = basePath;
+    }
 
-	public String getApiVersion() {
-		return apiVersion;
-	}
+    public String[] getLocations() {
+        return locations;
+    }
 
-	public void setApiVersion(String apiVersion) {
-		this.apiVersion = apiVersion;
-	}
+    public void setLocations(String[] locations) {
+        this.locations = locations;
+    }
 
-	public String getBasePath() {
-		return basePath;
-	}
+    public File getSwaggerDirectory() {
+        return swaggerDirectory;
+    }
 
-	public void setBasePath(String basePath) {
-		this.basePath = basePath;
-	}
+    public void setSwaggerDirectory(File swaggerDirectory) {
+        this.swaggerDirectory = swaggerDirectory;
+    }
 
-	public String[] getLocations() {
-		return locations;
-	}
+    public boolean isUseOutputFlatStructure() {
+        return useOutputFlatStructure;
+    }
 
-	public void setLocations(String[] locations) {
-		this.locations = locations;
-	}
+    public void setUseOutputFlatStructure(boolean useOutputFlatStructure) {
+        this.useOutputFlatStructure = useOutputFlatStructure;
+    }
 
-	public File getSwaggerDirectory() {
-		return swaggerDirectory;
-	}
-
-	public void setSwaggerDirectory(File swaggerDirectory) {
-		this.swaggerDirectory = swaggerDirectory;
-	}
-
-	public boolean isUseOutputFlatStructure() {
-		return useOutputFlatStructure;
-	}
-
-	public void setUseOutputFlatStructure(boolean useOutputFlatStructure) {
-		this.useOutputFlatStructure = useOutputFlatStructure;
-	}
-
-	@Override
-	public String toString() {
-		return "ApiSourceMojo [apiVersion=" + apiVersion + ", basePath="
-				+ basePath + ", locations=" + locations + ", swaggerDirectory="
-				+ swaggerDirectory + ", useOutputFlatStructure="
-				+ useOutputFlatStructure + "]";
-	}
-
+    @Override
+    public String toString() {
+        return "ApiSourceMojo{" +
+                "useOutputFlatStructure=" + useOutputFlatStructure +
+                ", apiVersion='" + apiVersion + '\'' +
+                ", basePath='" + basePath + '\'' +
+                ", locations=" + Arrays.toString(locations) +
+                ", swaggerDirectory=" + swaggerDirectory +
+                '}';
+    }
 }
